@@ -1,4 +1,4 @@
-# NiuLib
+# BioLib
 
 Yiwei Niu's open source Python3 libraries for bioinformatics.
 
@@ -21,7 +21,7 @@ Yiwei Niu's open source Python3 libraries for bioinformatics.
 - [x] read
 - [x] build Index
 - [x] random access
-- [ ] statistics
+- [x] statistics
 
 
 
