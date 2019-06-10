@@ -98,7 +98,7 @@ class Bed3:
         # other fields that do not include in the class
         items.append('\t'.join(map(str, lst[self.__n:])))
 
-        self.items = tuple(items)
+        self.items = items
         self.chrom = self.items[0]
         self.start = self.items[1]
         self.end = self.items[2]
@@ -110,21 +110,27 @@ class Bed3:
         return self.__chrom
     @chrom.setter
     def chrom(self, value):
+        assert isinstance(value, str)
         self.__chrom = value
+        self.items[0] = value
 
     @property
     def start(self):
         return self.__start
     @start.setter
     def start(self, value):
+        assert isinstance(value, int)
         self.__start = value
+        self.items[1] = value
 
     @property
     def end(self):
         return self.__end
     @end.setter
     def end(self, value):
+        assert isinstance(value, int)
         self.__end = value
+        self.items[2] = value
 
     def __str__(self):  # bed3 and bed6
         return '\t'.join(map(str, self.items))
@@ -185,7 +191,7 @@ class Bed3:
             if (new_bed.strand == '.') or (new_bed.strand == '+'):
                 new_bed.start -= upstream if (new_bed.start-upstream > 0) else 0
                 new_bed.end += downstream
-            else new_bed.strand = '-':
+            else:
                 new_bed.end += upstream
                 new_bed.start -= downstream if (new_bed.start-downstream > 0) else 0
         else:
@@ -274,7 +280,7 @@ class Bed3:
             elif self.strand=='.' or x.strand=='.':
                 logger.warning('Strand information will be ignored, since strand is empty.')
                 return self.distance(x, False)
-            elif: self.strand != x.strand:
+            elif self.strand != x.strand:
                 return None
             else:
                 tmp_list = sorted([self.start, self.end, x.start, x.end])
@@ -302,6 +308,7 @@ class Bed6(Bed3):
     @name.setter
     def name(self, value):
         self.__name = value
+        self.items[3] = value
 
     @property
     def score(self):
@@ -309,6 +316,7 @@ class Bed6(Bed3):
     @score.setter
     def score(self, value):
         self.__score = value
+        self.items[4] = value
 
     @property
     def strand(self):
@@ -318,6 +326,7 @@ class Bed6(Bed3):
         if value not in ('+', '-', '.'):
             raise ValueError('Strand must be ., +, or -.')
         self.__strand = value
+        self.items[5] = value
 
 
 class Bed12(Bed6):
@@ -345,6 +354,7 @@ class Bed12(Bed6):
     @thickStart.setter
     def thickStart(self, value):
         self.__thickStart = value
+        self.items[6] = value
 
     @property
     def thickEnd(self):
@@ -352,6 +362,7 @@ class Bed12(Bed6):
     @thickEnd.setter
     def thickEnd(self, value):
         self.__thickEnd = value
+        self.items[7] = value
 
     @property
     def itemRgb(self):
@@ -359,13 +370,16 @@ class Bed12(Bed6):
     @itemRgb.setter
     def itemRgb(self, value):
         self.__itemRgb = value
+        self.items[8] = value
 
     @property
     def blockCount(self):
         return self.__blockCount
     @blockCount.setter
     def blockCount(self, value):
+        assert isinstance(value, int)
         self.__blockCount = value
+        self.items[9] = value
 
     @property
     def blockSizes(self):
@@ -373,6 +387,7 @@ class Bed12(Bed6):
     @blockSizes.setter
     def blockSizes(self, value):
         self.__blockSizes = value
+        self.items[10] = value
 
     @property
     def blockStarts(self):
@@ -380,6 +395,7 @@ class Bed12(Bed6):
     @blockStarts.setter
     def blockStarts(self, value):
         self.__blockStarts = value
+        self.items[11] = value
 
     def __str__(self):  # bed12
         return '\t'.join(list(map(str, self.items[:10])) + \
@@ -456,7 +472,7 @@ class BedList:
             logger.error(str(err))
         else:
             for bed in self.records:
-                fout.write(bed + '\n')
+                fout.write(str(bed) + '\n')
             fout.close()
 
 
@@ -642,9 +658,6 @@ def run_merge(args):
     merged_interval.report(args.output)
 
 
-
-
-
 def test():
     '''
     test function
@@ -653,22 +666,12 @@ def test():
     a3 = Bed3('chr1\t1\t10\ta3')
     b3 = Bed3('chr1\t6\t15\tb3')
     # bed6
-    a6 = Bed6('chr1\t29553\t31109\tENSG00000243485.3\tlincRNA\t+', False)
-    #bed12
-    a12 = Bed12('chr1\t30266\t31109\tENST00000469289.1\t0\t+\t31109\t31109\t0\t2\t401,134,\t0,709,')
-    b12 = Bed12('chr1\t30700\t30900\tENST00000607096.1\t0\t+\t30700\t30700\t0\t1\t200,\t0,')
-    
-    print(a12.is_overlap(b12, False, False))
-    print(a12.is_overlap(b12, False, True))
-
-    x = [a3, b3, a6, a12]
-    y = sorted(x, reverse=True)
-    
-    z = BedFile('../test.bed')
-    z.sort(True)
-    #for bed in z:
-    #    print(bed)
-
+    a1 = Bed6('chr1\t100\t200\ta1\t1\t+')
+    a2 = Bed6('chr1\t180\t250\ta2\t2\t+')
+    print(a1.chrom, a2.chrom)
+    a1.chrom = 'chrM'
+    print(a1.chrom)
+    print(a1)
 
 def main():
 
@@ -694,7 +697,8 @@ def main():
 if __name__ == '__main__':
 
     try:
-        test()
+        #test()
+        main()
     except KeyboardInterrupt:
         logger.error("User interrupted me! ;-) Bye!")
         sys.exit(1)
