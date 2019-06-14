@@ -33,8 +33,12 @@ class InfernalRecord:
         tmp_list.append(x[-1])
         self.target = tmp_list[1]
         self.qname = tmp_list[3]  # query name
-        self.qstart = int(tmp_list[9]) - 1  # query start, 1-based to 0-based
-        self.qend = int(tmp_list[10])
+        if tmp_list[11] == '+':
+            self.qstart = int(tmp_list[9]) - 1  # query start, 1-based to 0-based
+            self.qend = int(tmp_list[10])
+        else:
+            self.qstart = int(tmp_list[10]) - 1  # query start, 1-based to 0-based
+            self.qend = int(tmp_list[9])
         self.qstrand = tmp_list[11]
         self.trunc = tmp_list[12]
         self.score = float(tmp_list[16])
@@ -89,15 +93,17 @@ class Infernal:
         rname, start, end, name, score, strand
         '''
         try:
+            count = 1
             with open('%s.bed' %output_prefix, 'w') as fout:
                 for record in self.records:
                     rname = record.qname
                     start = str(record.qstart)
                     end = str(record.qend)
-                    name = record.target
+                    name = 'infernal%s' %count + '-' + record.target
                     score = str(record.score)
                     strand = record.qstrand
                     fout.write('\t'.join([rname, start, end, name, score, strand]) + '\n')
+                    count += 1
         except IOError as err:
             logger.error('Error in transforming aragorn_out to bed: %s' %str(err))
 
@@ -304,10 +310,10 @@ def test():
     b.to_bed('/home/niuyw/Project/tRNA_promoter_190524/infernal/sf.genome.filter')
 
     # tRNAscan
-    tRNAscan_out = '/home/niuyw/Project/tRNA_promoter_190524/tRNAscan-SE/sf.tRNAscan.out'
-    c = tRNAscanSE(tRNAscan_out)
-    c.filter()
-    c.to_bed('/home/niuyw/Project/tRNA_promoter_190524/tRNAscan-SE/sf.tRNAscan.filter')
+    #tRNAscan_out = '/home/niuyw/Project/tRNA_promoter_190524/tRNAscan-SE/sf.tRNAscan.out'
+    #c = tRNAscanSE(tRNAscan_out)
+    #c.filter()
+    #c.to_bed('/home/niuyw/Project/tRNA_promoter_190524/tRNAscan-SE/sf.tRNAscan.filter')
 
 if __name__ == '__main__':
 

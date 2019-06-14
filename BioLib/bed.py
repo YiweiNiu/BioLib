@@ -212,7 +212,6 @@ class Bed3:
             elif self.blockCount==1 and x.blockCount==1:
                 return self.__is_overlap(x, False)
             else:
-                print('hree')
                 tmp_a, tmp_b = list(), list()
                 for i, j in enumerate(self.blockSizes):
                     tmp_a.append(Bed3((self.chrom, self.start+self.blockStarts[i], self.start+self.blockStarts[i]+j)))
