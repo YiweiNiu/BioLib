@@ -159,8 +159,14 @@ class Aragorn:
             for line in fin:
                 line = line.strip()
 
-                if line in self.genome.keys:
-                    rname = line
+                if line == "":
+                    continue
+
+                if not line.startswith('>'):
+                    line = line.split()[0]
+                    if line in self.genome.records:
+                        rname = line
+                    continue
 
                 if line.startswith('>'):
                     line = line.split()
@@ -172,7 +178,7 @@ class Aragorn:
                     start, end = line[1].strip('c[]').split(',')
                     start = int(start)-1; end = int(end)
                     strand = '-' if rc else '+'
-                    seq = self.genome.get_seq(rname, start, end, rc)
+                    seq = self.genome.subseq(rname, start, end, rc)
                     yield AragornRecord(rname, start, end, strand, seq_id, seq)
 
     def to_bed(self, output_prefix):
@@ -204,7 +210,7 @@ class tRNAscanSERecord:
         @parameter x: a line of tRNAscan-SE output
         '''
         x = x.split('\t')
-        self.rname = x[0]
+        self.rname = x[0].strip()
         tmp1, tmp2 = int(x[2]), int(x[3])
         if tmp1 < tmp2:
             self.strand = '+'
